@@ -35,87 +35,190 @@ namespace GView::Type::SQL
 
     namespace OperatorType
     {
-        constexpr uint32 Bigger        = 0;
-        constexpr uint32 Smaller       = 1;
-        constexpr uint32 Equal         = 2;
-        constexpr uint32 BiggerOrEq    = 3;
-        constexpr uint32 SmallerOrEq   = 4;
-        constexpr uint32 Different     = 5;
-        /*constexpr uint32 Different2     = 6;*/
-        constexpr uint32 Plus          = 7;
-        constexpr uint32 Minus         = 8;
-        constexpr uint32 Multiply      = 9;
-        constexpr uint32 Division      = 10;
-        constexpr uint32 Modulo        = 11;
-        constexpr uint32 MemberAccess  = 12;
-        constexpr uint32 Comma         = 13;
-        constexpr uint32 Semicolumn    = 14;
-        constexpr uint32 ParenOpen     = 15;
-        constexpr uint32 ParenClose    = 16;
-        constexpr uint32 Concat        = 17;
-        constexpr uint32 Cast          = 18;
-        constexpr uint32 JsonArrow     = 19;
-        constexpr uint32 JsonArrowText = 20;
+        // Arithmetic
+        constexpr uint32 Add = 0; // +
+        constexpr uint32 Sub = 1; // -
+        constexpr uint32 Mul = 2; // *
+        constexpr uint32 Div = 3; // /
+        constexpr uint32 Mod = 4; // %
+
+        // Bitwise
+        constexpr uint32 BitAnd = 5; // &
+        constexpr uint32 BitOr  = 6; // |
+        constexpr uint32 BitXor = 7; // ^
+        constexpr uint32 BitNot = 8; // ~
+
+        // Comparison
+        constexpr uint32 Eq   = 9;  // =
+        constexpr uint32 Gr   = 10; // >
+        constexpr uint32 Ls   = 11; // <
+        constexpr uint32 GrEq = 12; // >=
+        constexpr uint32 LsEq = 13; // <=
+        constexpr uint32 Neq  = 14; // <> or !=
+
+        // Compound
+        constexpr uint32 AddEq = 15; // +=
+        constexpr uint32 SubEq = 16; // -=
+        constexpr uint32 MulEq = 17; // *=
+        constexpr uint32 DivEq = 18; // /=
+        constexpr uint32 ModEq = 19; // %=
+        constexpr uint32 AndEq = 20; // &=
+        constexpr uint32 OrEq  = 21; // |=
+        constexpr uint32 XorEq = 22; // ^=
+
+        constexpr uint32 MemberAccess = 23; // .
+
     } // namespace OperatorType
 
     namespace Operators
     {
-        uint8 chars_ids[128]                     = { 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,  0, 0, 0,  0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,  0,  0, 0, 0,
-                                                     0, 4, 0, 0, 0, 9, 0, 0, 13, 14, 7, 5, 11, 6, 10, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 12, 2,  3, 1, 0,
-                                                     0, 0, 0, 0, 0, 0, 0, 0, 0,  0,  0, 0, 0,  0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,  0,  0, 0, 0,
-                                                     0, 0, 0, 0, 0, 0, 0, 0, 0,  0,  0, 0, 0,  0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,  15, 0, 0, 0 };
-        constexpr uint32 HASH_DEVIDER            = 50;
-        uint32 operator_hash_table[HASH_DEVIDER] = { TokenType::None,
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::Bigger << 8) | (uint32) (990687777 << 16),
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::Smaller << 8) | (uint32) (957132539 << 16),
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::Equal << 8) | (uint32) (940354920 << 16),
-                                                     TokenType::None,
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::Plus << 8) | (uint32) (772578730 << 16),
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::Minus << 8) | (uint32) (671913016 << 16),
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::Multiply << 8) | (uint32) (789356349 << 16),
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::Division << 8) | (uint32) (705468254 << 16),
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::Modulo << 8) | (uint32) (537692064 << 16),
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::MemberAccess << 8) | (uint32) (722245873 << 16),
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::Comma << 8) | (uint32) (688690635 << 16),
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::Semicolumn << 8) | (uint32) (1041020634 << 16),
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::ParenOpen << 8) | (uint32) (755801111 << 16),
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::ParenClose << 8) | (uint32) (739023492 << 16),
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::Different << 8) | (uint32) (2482446367 << 16),
-                                                     TokenType::None,
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::SmallerOrEq << 8) | (uint32) (2499223986 << 16),
-                                                     TokenType::None,
-                                                     TokenType::None,
-                                                     TokenType::None,
-                                                     TokenType::None,
-                                                     TokenType::None,
-                                                     TokenType::None,
-                                                     TokenType::None,
-                                                     TokenType::None,
-                                                     TokenType::None,
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::JsonArrowText << 8) | (uint32) (1371494052 << 16),
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::Cast << 8) | (uint32) (2550542581 << 16),
-                                                     TokenType::None,
-                                                     TokenType::None,
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::Different << 8) | (uint32) (2428715011 << 16),
-                                                     TokenType::None,
-                                                     TokenType::None,
-                                                     TokenType::None,
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::BiggerOrEq << 8) | (uint32) (284975636 << 16),
-                                                     TokenType::None,
-                                                     TokenType::None,
-                                                     TokenType::None,
-                                                     TokenType::None,
-                                                     TokenType::None,
-                                                     TokenType::None,
-                                                     TokenType::None,
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::JsonArrow << 8) | (uint32) (298648946 << 16),
-                                                     TokenType::None,
-                                                     (uint32) TokenType::Operator | (uint32) (OperatorType::Concat << 8) | (uint32) (1431891397 << 16),
-                                                     TokenType::None,
-                                                     TokenType::None,
-                                                     TokenType::None,
-                                                     TokenType::None };
+        uint8 chars_ids[128] = {
+            0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  0,
+            0, 4, 0, 0, 0, 9, 10, 0, 0, 0, 7, 5, 0, 6, 14, 8,                                                    // ! % & * + - /
+            0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 3, 1, 2, 0,                                                    // < = >
+            0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0,  0, 0, 0, 0, 0, 0, 0, 12, 0, // ^
+            0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 13, 0                           // | ~
+        };
 
+        constexpr uint32 HASH_DEVIDER = 133;
+
+        // Indices calculated via: (ID1) or ((ID1 << 5) + ID2) % 133
+        uint32 operator_hash_table[HASH_DEVIDER] = {
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::Eq << 8) | (uint32) (1 << 16), // =  (Hash: 1)
+            (uint32) TokenType::Operator | (uint32) (OperatorType::Gr << 8) | (uint32) (2 << 16), // >  (Hash: 2)
+            (uint32) TokenType::Operator | (uint32) (OperatorType::Ls << 8) | (uint32) (3 << 16), // <  (Hash: 3)
+            TokenType::None, // ! is not an operator by itself, strictly for !=
+            (uint32) TokenType::Operator | (uint32) (OperatorType::Add << 8) | (uint32) (5 << 16),     // +  (Hash: 5)
+            (uint32) TokenType::Operator | (uint32) (OperatorType::Sub << 8) | (uint32) (6 << 16),     // -  (Hash: 6)
+            (uint32) TokenType::Operator | (uint32) (OperatorType::Mul << 8) | (uint32) (7 << 16),     // * (Hash: 7)
+            (uint32) TokenType::Operator | (uint32) (OperatorType::Div << 8) | (uint32) (8 << 16),     // /  (Hash: 8)
+            (uint32) TokenType::Operator | (uint32) (OperatorType::Mod << 8) | (uint32) (9 << 16),     // %  (Hash: 9)
+            (uint32) TokenType::Operator | (uint32) (OperatorType::BitAnd << 8) | (uint32) (10 << 16), // &  (Hash: 10)
+            (uint32) TokenType::Operator | (uint32) (OperatorType::BitOr << 8) | (uint32) (11 << 16),  // |  (Hash: 11)
+            (uint32) TokenType::Operator | (uint32) (OperatorType::BitXor << 8) | (uint32) (12 << 16), // ^  (Hash: 12)
+            (uint32) TokenType::Operator | (uint32) (OperatorType::BitNot << 8) | (uint32) (13 << 16), // ~  (Hash: 13)
+            (uint32) TokenType::Operator | (uint32) (OperatorType::MemberAccess << 8) | (uint32) (14 << 16), // . (Hash: 14)
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::ModEq << 8) | (uint32) (289 << 16), // %= (Hash: 289 -> idx 23)
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::AddEq << 8) | (uint32) (161 << 16), // += (Hash: 161 -> idx 28)
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::AndEq << 8) | (uint32) (321 << 16), // &= (Hash: 321 -> idx 55)
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::SubEq << 8) | (uint32) (193 << 16), // -= (Hash: 193 -> idx 60)
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::GrEq << 8) | (uint32) (65 << 16), // >= (Hash: 65 -> idx 65)
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::OrEq << 8) | (uint32) (353 << 16), // |= (Hash: 353 -> idx 87)
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::MulEq << 8) | (uint32) (225 << 16), // *= (Hash: 225 -> idx 92)
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::LsEq << 8) | (uint32) (97 << 16), // <= (Hash: 97 -> idx 97)
+            (uint32) TokenType::Operator | (uint32) (OperatorType::Neq << 8) | (uint32) (98 << 16),  // <> (Hash: 98 -> idx 98)
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::XorEq << 8) | (uint32) (385 << 16), // ^= (Hash: 385 -> idx 119)
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::DivEq << 8) | (uint32) (257 << 16), // /= (Hash: 257 -> idx 124)
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::Neq << 8) | (uint32) (129 << 16), // != (Hash: 129 -> idx 129)
+            TokenType::None,
+            TokenType::None,
+            TokenType::None
+        };
+        
         bool TextToOperatorID(const char16* txt, uint32 size, uint32& opID, uint32& opSize)
         {
             // compute the hashes over the entire 3 cases
@@ -276,7 +379,7 @@ namespace GView::Type::SQL
         };
         uint32 TextToKeywordID(const GView::View::LexicalViewer::TextParser& text, uint32 start, uint32 end)
         {
-            auto* res = BinarySearch(text.ComputeHash32(start, end, false), list, 86);
+            auto* res = BinarySearch(text.ComputeHash32(start, end, true), list, 86);
             if (res == nullptr)
                 return TokenType::None;
             return TokenType::Keyword | (res->id << 16);
@@ -391,6 +494,8 @@ namespace GView::Type::SQL
         constexpr uint8 ExpressionClose   = 12;
         constexpr uint8 Space             = 13;
         constexpr uint8 Invalid           = 14;
+        constexpr uint8 SingleLineComment = 15;
+        constexpr uint8 Comment           = 16; 
 
         uint8 Sql_Groups_IDs[] = { Invalid,   Invalid,  Invalid,    Invalid,    Invalid,   Invalid,        Invalid,
                                    Invalid,   Invalid,  Space,      Space,      Invalid,   Invalid,        Space,
@@ -417,6 +522,52 @@ namespace GView::Type::SQL
             if (c < ARRAY_LEN(Sql_Groups_IDs))
                 return Sql_Groups_IDs[c];
             return Invalid;
+        }
+    } // namespace CharType
+
+    namespace FunctionsType
+    {
+        constexpr uint32 Avg      = 0;
+        constexpr uint32 Count    = 1;
+        constexpr uint32 Max      = 2;
+        constexpr uint32 Min      = 3;
+        constexpr uint32 Sum      = 4;
+        constexpr uint32 Upper    = 5;
+        constexpr uint32 Lower    = 6;
+        constexpr uint32 Round    = 7;
+        constexpr uint32 Len      = 8;
+        constexpr uint32 Now      = 9;
+        constexpr uint32 Mid      = 10;
+        constexpr uint32 Format   = 11;
+        constexpr uint32 Coalesce = 12;
+        constexpr uint32 IsNull   = 13;
+    }
+
+    namespace Function
+    {
+        HashText list[] = {
+            { 0x0C4D1D49, FunctionsType::Max },      
+            { 0x0C4D2077, FunctionsType::Mid },      
+            { 0x0C4D2107, FunctionsType::Min },      
+            { 0x0C4D3915, FunctionsType::Sum },      
+            { 0x0C531238, FunctionsType::Now },      
+            { 0x0C8259C9, FunctionsType::Len },      
+            { 0x0F5F2F04, FunctionsType::Count },    
+            { 0x10364969, FunctionsType::Round },    
+            { 0x1065C7C7, FunctionsType::Lower },    
+            { 0x1069F747, FunctionsType::Upper },    
+            { 0x2D906404, FunctionsType::Avg },      
+            { 0x367F4F72, FunctionsType::IsNull },   
+            { 0x4864A62D, FunctionsType::Format },   
+            { 0x861CB29A, FunctionsType::Coalesce }, 
+        };
+
+        uint32 TextToFunctionID(const GView::View::LexicalViewer::TextParser& text, uint32 start, uint32 end)
+        {
+            auto* res = BinarySearch(text.ComputeHash32(start, end, true), list, 14);
+            if (res == nullptr)
+                return TokenType::None;
+            return TokenType::Keyword | (res->id << 16);
         }
     }
 
@@ -511,7 +662,7 @@ namespace GView::Type::SQL
             return pos + sz;
         } else {
             // unknown operator
-            tokenList.Add(TokenType::Operator, pos, next, TokenColor::Word).SetError("Invalid C++ operator");
+            tokenList.Add(TokenType::Operator, pos, next, TokenColor::Word).SetError("Invalid SQL operator");
             return next;
         }
     }
@@ -554,32 +705,66 @@ namespace GView::Type::SQL
             auto ch   = text[idx];
             auto type = CharType::GetCharType(ch);
 
+            // check for comments
+            if (ch == '-') {
+                auto next = text[idx + 1];
+                if (next == '-')
+                    type = CharType::SingleLineComment;
+            } else if (ch == '/') {
+                auto next = text[idx + 1];
+                if (next == '*')
+                    type = CharType::Comment;
+            }
             switch (type) {
             case CharType::Space:
                 idx = text.ParseSpace(idx, SpaceType::All);
                 break;
-            //case CharType::ArrayOpen:
-            //    tokenList.Add(
-            //          TokenType::ArrayOpen,
-            //          idx,
-            //          idx + 1,
-            //          TokenColor::Operator,
-            //          TokenDataType::None,
-            //          TokenAlignament::None,
-            //          TokenFlags::DisableSimilaritySearch);
-            //    idx++;
-            //    break;
-            //case CharType::ArrayClose:
-            //    tokenList.Add(
-            //          TokenType::ArrayClose,
-            //          idx,
-            //          idx + 1,
-            //          TokenColor::Operator,
-            //          TokenDataType::None,
-            //          TokenAlignament::None,
-            //          TokenFlags::DisableSimilaritySearch);
-            //    idx++;
-            //    break;
+            case CharType::SingleLineComment:
+                next = text.ParseUntilEndOfLine(idx);
+                tokenList.Add(
+                      TokenType::Comment,
+                      idx,
+                      next,
+                      TokenColor::Comment,
+                      TokenDataType::MetaInformation,
+                      TokenAlignament::NewLineAfter | TokenAlignament::AddSpaceBefore,
+                      TokenFlags::DisableSimilaritySearch);
+                idx = next;
+                break;
+            case CharType::Comment:
+                next = text.ParseUntilNextCharacterAfterText(idx, "*/", false);
+                tokenList.Add(
+                      TokenType::Comment,
+                      idx,
+                      next,
+                      TokenColor::Comment,
+                      TokenDataType::MetaInformation,
+                      TokenAlignament::AddSpaceBefore | TokenAlignament::AddSpaceAfter,
+                      TokenFlags::DisableSimilaritySearch);
+                idx = next;
+                break;
+            case CharType::ArrayOpen:
+                tokenList.Add(
+                      TokenType::ArrayOpen,
+                      idx,
+                      idx + 1,
+                      TokenColor::Operator,
+                      TokenDataType::None,
+                      TokenAlignament::None,
+                      TokenFlags::DisableSimilaritySearch);
+                idx++;
+                break;
+            case CharType::ArrayClose:
+                tokenList.Add(
+                      TokenType::ArrayClose,
+                      idx,
+                      idx + 1,
+                      TokenColor::Operator,
+                      TokenDataType::None,
+                      TokenAlignament::None,
+                      TokenFlags::DisableSimilaritySearch);
+                idx++;
+                break;
             case CharType::ExpressionOpen:
                 tokenList.Add(
                       TokenType::ExpressionOpen,

@@ -27,16 +27,16 @@ extern "C"
 
         LexicalViewer::Settings settings;
         settings.SetParser(sql.ToObjectRef<LexicalViewer::ParseInterface>());
-        //settings.AddPlugin(&sql->plugins.removeComments);
+        settings.AddPlugin(&sql->plugins.removeComments);
         win->CreateViewer(settings);
 
         win->CreateViewer<TextViewer::Settings>();
 
         View::BufferViewer::Settings s{};
-        //sql->selectionZoneInterface = win->GetSelectionZoneInterfaceFromViewerCreation(s);
+        sql->selectionZoneInterface = win->GetSelectionZoneInterfaceFromViewerCreation(s);
 
         // add panels
-        //win->AddPanel(Pointer<TabPage>(new SQL::Panels::Information(sql)), true);
+        win->AddPanel(Pointer<TabPage>(new SQL::Panels::Information(sql)), true);
 
         return true;
     }

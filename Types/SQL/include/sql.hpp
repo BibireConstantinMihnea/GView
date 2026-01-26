@@ -42,7 +42,22 @@ namespace Type
 
             constexpr uint32 BlockOpen  = 21; // BEGIN
             constexpr uint32 BlockClose = 22; // END
+            constexpr uint32 ArrayOpen  = 23;
+            constexpr uint32 ArrayClose = 24;
         } // namespace TokenType
+
+        namespace Plugins
+        {
+            class RemoveComments : public GView::View::LexicalViewer::Plugin
+            {
+              public:
+                virtual std::string_view GetName() override;
+                virtual std::string_view GetDescription() override;
+                virtual bool CanBeAppliedOn(const GView::View::LexicalViewer::PluginData& data) override;
+                virtual GView::View::LexicalViewer::PluginAfterActionRequest Execute(
+                      GView::View::LexicalViewer::PluginData& data, Reference<Window> parent) override;
+            };
+        } // namespace Plugins
 
         class SQLFile : public TypeInterface, public GView::View::LexicalViewer::ParseInterface
         {
@@ -62,8 +77,17 @@ namespace Type
             void RemoveLineContinuityCharacter(GView::View::LexicalViewer::TextEditor& editor);
             void GetTokenIDStringRepresentation(uint32 id, AppCUI::Utils::String& str);
 
+        public:
+            struct
+            {
+              Plugins::RemoveComments removeComments;
+            } plugins;
+
           public:
             SQLFile();
+            virtual ~SQLFile()
+            {
+            }
 
             bool Update();
 
@@ -107,7 +131,7 @@ namespace Type
         {
             class Information : public AppCUI::Controls::TabPage
             {
-                Reference<GView::Type::SQL::SQLFile> cpp;
+                Reference<GView::Type::SQL::SQLFile> sql;
                 Reference<AppCUI::Controls::ListView> general;
                 Reference<AppCUI::Controls::ListView> issues;
 
@@ -116,7 +140,7 @@ namespace Type
                 void RecomputePanelsPositions();
 
               public:
-                Information(Reference<GView::Type::SQL::SQLFile> cpp);
+                Information(Reference<GView::Type::SQL::SQLFile> sql);
 
                 void Update();
                 virtual void OnAfterResize(int newWidth, int newHeight) override
