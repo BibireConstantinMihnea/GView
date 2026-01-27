@@ -471,7 +471,7 @@ namespace GView::Type::SQL
         };
         uint32 TextToDatatypeID(const GView::View::LexicalViewer::TextParser& text, uint32 start, uint32 end)
         {
-            auto* res = BinarySearch(text.ComputeHash32(start, end, false), list, 36);
+            auto* res = BinarySearch(text.ComputeHash32(start, end, true), list, 36);
             if (res == nullptr)
                 return TokenType::None;
             return TokenType::Datatype | (res->id << 16);
@@ -546,20 +546,20 @@ namespace GView::Type::SQL
     namespace Function
     {
         HashText list[] = {
-            { 0x0C4D1D49, FunctionsType::Max },      
-            { 0x0C4D2077, FunctionsType::Mid },      
-            { 0x0C4D2107, FunctionsType::Min },      
-            { 0x0C4D3915, FunctionsType::Sum },      
-            { 0x0C531238, FunctionsType::Now },      
-            { 0x0C8259C9, FunctionsType::Len },      
-            { 0x0F5F2F04, FunctionsType::Count },    
-            { 0x10364969, FunctionsType::Round },    
-            { 0x1065C7C7, FunctionsType::Lower },    
-            { 0x1069F747, FunctionsType::Upper },    
-            { 0x2D906404, FunctionsType::Avg },      
-            { 0x367F4F72, FunctionsType::IsNull },   
-            { 0x4864A62D, FunctionsType::Format },   
+            { 0x0A8C6A47, FunctionsType::Upper },    
+            { 0x1E66046B, FunctionsType::Avg },      
+            { 0x28B19AF7, FunctionsType::Now },      
+            { 0x366ADB0C, FunctionsType::Len },      
+            { 0x39B1DDF4, FunctionsType::Count },    
+            { 0x4F0BE23B, FunctionsType::Round },    
+            { 0x625B9014, FunctionsType::IsNull },   
             { 0x861CB29A, FunctionsType::Coalesce }, 
+            { 0xB51D04BA, FunctionsType::Lower },    
+            { 0xB99D8552, FunctionsType::Format },   
+            { 0xC38F3BE5, FunctionsType::Mid },      
+            { 0xC98F4557, FunctionsType::Min },      
+            { 0xD7A2E319, FunctionsType::Max },      
+            { 0xDD4E3AA8, FunctionsType::Sum },      
         };
 
         uint32 TextToFunctionID(const GView::View::LexicalViewer::TextParser& text, uint32 start, uint32 end)
@@ -567,7 +567,7 @@ namespace GView::Type::SQL
             auto* res = BinarySearch(text.ComputeHash32(start, end, true), list, 14);
             if (res == nullptr)
                 return TokenType::None;
-            return TokenType::Keyword | (res->id << 16);
+            return TokenType::Function | (res->id << 16);
         }
     }
 
@@ -593,22 +593,24 @@ namespace GView::Type::SQL
         auto tokenFlags = TokenFlags::None;
 
         if (tokType == TokenType::None) {
-            tokType = Constant::TextToConstantID(text, pos, next);
-            if (tokType == TokenType::None) 
-            {
-                tokType = Datatype::TextToDatatypeID(text, pos, next);
-                if (tokType == TokenType::None) 
-                {
-                    tokType = TokenType::String;
-                } else 
-                {
-                    tokColor = TokenColor::Datatype;
+            tokType = Function::TextToFunctionID(text, pos, next);
+            if (tokType == TokenType::None) {
+                tokType = Constant::TextToConstantID(text, pos, next);
+                if (tokType == TokenType::None) {
+                    tokType = Datatype::TextToDatatypeID(text, pos, next);
+                    if (tokType == TokenType::None) {
+                        tokType = TokenType::String;
+                    } else {
+                        tokColor = TokenColor::Datatype;
+                    }
+                } else {
+                    tokColor   = TokenColor::Constant;
+                    tokenFlags = TokenFlags::DisableSimilaritySearch;
                 }
-            } 
-            else 
-            {
-                tokColor   = TokenColor::Constant;
+            } else {
+                tokColor = TokenColor::Preprocesor;
                 tokenFlags = TokenFlags::DisableSimilaritySearch;
+                align = TokenAlignament::AddSpaceAfter | TokenAlignament::AddSpaceBefore;
             }
             auto lastTokenID = tokenList.GetLastTokenID();
             switch (lastTokenID & 0xFFFF) 
@@ -627,16 +629,46 @@ namespace GView::Type::SQL
                 align = TokenAlignament::AddSpaceBefore;
                 break;
             }
-        } 
+        }
         else 
         {
-            tokColor   = TokenColor::Keyword;
-            align      = TokenAlignament::AddSpaceAfter | TokenAlignament::AddSpaceBefore;
-            tokenFlags = TokenFlags::DisableSimilaritySearch;
-            if (((tokType >> 16) == KeywordsType::Else) && (tokenList.GetLastTokenID() == TokenType::BlockClose))
-            {
-                // if (...) { ... } else ...
-                align = align | TokenAlignament::AfterPreviousToken;
+            // handle BEGIN END type blocks
+            uint32 keywordID = tokType >> 16;
+
+            if (keywordID == KeywordsType::Begin) {
+                tokType = TokenType::BlockOpen;
+            } else if (keywordID == KeywordsType::Case) {
+                tokType = TokenType::BlockOpen;
+            } else if (keywordID == KeywordsType::End) {
+                tokType = TokenType::BlockClose;
+            }
+
+            if (tokType == TokenType::BlockOpen) {
+                tokColor   = TokenColor::Keyword;
+                align      = TokenAlignament::NewLineAfter | TokenAlignament::AddSpaceBefore | TokenAlignament::StartsOnNewLine;
+                tokenFlags = TokenFlags::DisableSimilaritySearch;
+            } else if (tokType == TokenType::BlockClose) {
+                tokColor   = TokenColor::Keyword;
+                align      = TokenAlignament::StartsOnNewLine | TokenAlignament::NewLineAfter | TokenAlignament::ClearIndentAfterPaint;
+                tokenFlags = TokenFlags::DisableSimilaritySearch;
+            } else {
+                tokColor   = TokenColor::Keyword;
+                align      = TokenAlignament::AddSpaceAfter | TokenAlignament::AddSpaceBefore;
+                tokenFlags = TokenFlags::DisableSimilaritySearch;
+                // if (((tokType >> 16) == KeywordsType::Else) && (tokenList.GetLastTokenID() == TokenType::BlockClose))
+                //{
+                //     // if (...) { ... } else ...
+                //     align = align | TokenAlignament::AfterPreviousToken;
+                // }
+            }
+
+            // handle END followed by another keyword
+            auto lastTokenID = tokenList.GetLastTokenID();
+
+            if (lastTokenID == TokenType::BlockClose) {
+                if (tokColor == TokenColor::Keyword) {
+                    align |= TokenAlignament::AfterPreviousToken | TokenAlignament::AddSpaceBefore;
+                }
             }
         }
 

@@ -44,6 +44,8 @@ namespace Type
             constexpr uint32 BlockClose = 22; // END
             constexpr uint32 ArrayOpen  = 23;
             constexpr uint32 ArrayClose = 24;
+
+            constexpr uint32 Function = 25;
         } // namespace TokenType
 
         namespace Plugins
