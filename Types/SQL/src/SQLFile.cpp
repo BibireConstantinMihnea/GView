@@ -255,7 +255,7 @@ namespace GView::Type::SQL
         }
     } // namespace Operators
 
-    namespace KeywordsType
+namespace KeywordsType
     {
         constexpr uint32 Where       = 0;
         constexpr uint32 Index       = 1;
@@ -343,6 +343,9 @@ namespace GView::Type::SQL
         constexpr uint32 Then        = 83;
         constexpr uint32 Intersect   = 84;
         constexpr uint32 Full        = 85;
+        constexpr uint32 Outer       = 86;
+        constexpr uint32 Asc         = 87;
+        constexpr uint32 Desc        = 88;
     } // namespace KeywordsType
     namespace Keyword
     {
@@ -578,11 +581,12 @@ namespace GView::Type::SQL
 	bool SQLFile::Update() {
         return true;
 	}
+    bool inSelectList = false;
 
-    uint32 SQLFile::TokenizeWord(const GView::View::LexicalViewer::TextParser& text, TokensList& tokenList, uint32 pos)
+uint32 SQLFile::TokenizeWord(const GView::View::LexicalViewer::TextParser& text, TokensList& tokenList, uint32 pos)
     {
-        auto next = text.Parse(pos, [](char16 ch) 
-        {
+        inSelectList    = false;
+        auto next       = text.Parse(pos, [](char16 ch) {
             auto type = CharType::GetCharType(ch);
             return (type == CharType::Word) || (type == CharType::Number);
         });
@@ -608,13 +612,12 @@ namespace GView::Type::SQL
                     tokenFlags = TokenFlags::DisableSimilaritySearch;
                 }
             } else {
-                tokColor = TokenColor::Preprocesor;
+                tokColor   = TokenColor::Preprocesor;
                 tokenFlags = TokenFlags::DisableSimilaritySearch;
-                align = TokenAlignament::AddSpaceAfter | TokenAlignament::AddSpaceBefore;
+                align      = TokenAlignament::AddSpaceAfter | TokenAlignament::AddSpaceBefore;
             }
             auto lastTokenID = tokenList.GetLastTokenID();
-            switch (lastTokenID & 0xFFFF) 
-            {
+            switch (lastTokenID & 0xFFFF) {
             case TokenType::ExpressionOpen:
                 align = TokenAlignament::None;
                 break;
@@ -623,49 +626,137 @@ namespace GView::Type::SQL
                 align = TokenAlignament::None;
                 if ((opID != OperatorType::MemberAccess))
                     align = TokenAlignament::AddSpaceBefore;
-
                 break;
             default:
                 align = TokenAlignament::AddSpaceBefore;
                 break;
             }
-        }
-        else 
-        {
-            // handle BEGIN END type blocks
+        } else {
             uint32 keywordID = tokType >> 16;
+            auto lastTokenID = tokenList.GetLastTokenID();
 
-            if (keywordID == KeywordsType::Begin) {
-                tokType = TokenType::BlockOpen;
-            } else if (keywordID == KeywordsType::Case) {
+            if (keywordID == KeywordsType::Begin || keywordID == KeywordsType::Case) {
                 tokType = TokenType::BlockOpen;
             } else if (keywordID == KeywordsType::End) {
                 tokType = TokenType::BlockClose;
+            } else if (keywordID == KeywordsType::Select) {
+                tokType      = TokenType::BlockOpen | (keywordID << 16);
+                inSelectList = true;
+            } else if (keywordID == KeywordsType::From) {
+                // Only close block if NOT preceded by DELETE (handles DELETE FROM)
+                bool precededByDelete = ((lastTokenID & 0xFFFF) == TokenType::Keyword) && ((lastTokenID >> 16) == KeywordsType::Delete);
+
+                if (!precededByDelete) {
+                    tokType      = TokenType::BlockClose | (keywordID << 16);
+                    inSelectList = false;
+                }
             }
 
-            if (tokType == TokenType::BlockOpen) {
+            if ((tokType & 0xFFFF) == TokenType::BlockOpen) {
                 tokColor   = TokenColor::Keyword;
-                align      = TokenAlignament::NewLineAfter | TokenAlignament::AddSpaceBefore | TokenAlignament::StartsOnNewLine;
                 tokenFlags = TokenFlags::DisableSimilaritySearch;
-            } else if (tokType == TokenType::BlockClose) {
+
+                if (keywordID == KeywordsType::Select) {
+                    // BASE ALIGNMENT: Always separate from previous block
+                    align = TokenAlignament::NewLineBefore | TokenAlignament::StartsOnNewLine;
+
+                    // CONDITIONAL: Peek ahead for '*'
+                    // If next is '*', we do NOT force NewLineAfter (so '*' stays on this line)
+                    auto peekPos = text.ParseSpace(next, SpaceType::All);
+                    if (peekPos < text.Len() && text[peekPos] == '*') {
+                        align |= TokenAlignament::AddSpaceAfter;
+                    } else {
+                        align |= TokenAlignament::NewLineAfter;
+                    }
+                } else {
+                    align = TokenAlignament::NewLineAfter | TokenAlignament::AddSpaceBefore | TokenAlignament::StartsOnNewLine;
+                }
+            }
+            // PROBLEM AREA WAS HERE:
+            else if ((tokType & 0xFFFF) == TokenType::BlockClose) {
                 tokColor   = TokenColor::Keyword;
-                align      = TokenAlignament::StartsOnNewLine | TokenAlignament::NewLineAfter | TokenAlignament::ClearIndentAfterPaint;
                 tokenFlags = TokenFlags::DisableSimilaritySearch;
+
+                if (keywordID == KeywordsType::From) {
+                    // FIX: Check for '*' (Mul operator) here because FROM is a BlockClose!
+                    bool precededByStar = ((lastTokenID & 0xFFFF) == TokenType::Operator) && ((lastTokenID >> 16) == OperatorType::Mul);
+
+                    if (precededByStar) {
+                        // Force it onto the same line
+                        align = TokenAlignament::AfterPreviousToken | TokenAlignament::AddSpaceBefore | TokenAlignament::AddSpaceAfter |
+                                TokenAlignament::ClearIndentBeforePaint;
+                    } else {
+                        // Default FROM behavior (new line)
+                        align = TokenAlignament::StartsOnNewLine | TokenAlignament::ClearIndentBeforePaint | TokenAlignament::AddSpaceAfter;
+                    }
+                } else {
+                    align = TokenAlignament::StartsOnNewLine | TokenAlignament::NewLineAfter | TokenAlignament::ClearIndentAfterPaint;
+                }
             } else {
                 tokColor   = TokenColor::Keyword;
                 align      = TokenAlignament::AddSpaceAfter | TokenAlignament::AddSpaceBefore;
                 tokenFlags = TokenFlags::DisableSimilaritySearch;
-                // if (((tokType >> 16) == KeywordsType::Else) && (tokenList.GetLastTokenID() == TokenType::BlockClose))
-                //{
-                //     // if (...) { ... } else ...
-                //     align = align | TokenAlignament::AfterPreviousToken;
-                // }
+
+                switch (keywordID) {
+                case KeywordsType::Select:
+                    align = TokenAlignament::AfterPreviousToken | TokenAlignament::NewLineAfter;
+                    break;
+
+                case KeywordsType::From: {
+                    // This code is only reached if FROM is NOT a BlockClose (e.g. DELETE FROM).
+                    // "SELECT * FROM" will NOT reach here, so the logic must be in the block above.
+                    bool precededByDelete = ((lastTokenID & 0xFFFF) == TokenType::Keyword) && ((lastTokenID >> 16) == KeywordsType::Delete);
+
+                    if (precededByDelete) {
+                        align = TokenAlignament::AfterPreviousToken | TokenAlignament::AddSpaceBefore | TokenAlignament::AddSpaceAfter;
+                    } else {
+                        align = TokenAlignament::StartsOnNewLine | TokenAlignament::ClearIndentBeforePaint | TokenAlignament::AddSpaceAfter;
+                    }
+                    break;
+                }
+
+                case KeywordsType::Update:
+                case KeywordsType::Delete:
+                case KeywordsType::Insert:
+                case KeywordsType::Create:
+                case KeywordsType::Drop:
+                case KeywordsType::Alter:
+                case KeywordsType::Truncate:
+                    align = TokenAlignament::NewLineBefore | TokenAlignament::StartsOnNewLine | TokenAlignament::AddSpaceAfter;
+                    break;
+
+                case KeywordsType::Where:
+                case KeywordsType::Group:
+                case KeywordsType::Order:
+                case KeywordsType::Having:
+                case KeywordsType::Join:
+                case KeywordsType::Set:
+                    align = TokenAlignament::StartsOnNewLine | TokenAlignament::ClearIndentBeforePaint | TokenAlignament::AddSpaceAfter;
+                    break;
+
+                case KeywordsType::Values:
+                    align = TokenAlignament::AddSpaceBefore | TokenAlignament::NewLineAfter;
+                    break;
+
+                case KeywordsType::And:
+                case KeywordsType::Or:
+                    align = TokenAlignament::AfterPreviousToken | TokenAlignament::AddSpaceAfter | TokenAlignament::AddSpaceBefore;
+                    break;
+
+                case KeywordsType::By:
+                case KeywordsType::Into:
+                case KeywordsType::Left:
+                case KeywordsType::Right:
+                case KeywordsType::Inner:
+                case KeywordsType::Full:
+                case KeywordsType::Cross:
+                case KeywordsType::On:
+                    align = TokenAlignament::AfterPreviousToken | TokenAlignament::AddSpaceBefore | TokenAlignament::AddSpaceAfter;
+                    break;
+                }
             }
 
-            // handle END followed by another keyword
-            auto lastTokenID = tokenList.GetLastTokenID();
-
-            if (lastTokenID == TokenType::BlockClose) {
+            if ((lastTokenID & 0xFFFF) == TokenType::BlockClose) {
                 if (tokColor == TokenColor::Keyword) {
                     align |= TokenAlignament::AfterPreviousToken | TokenAlignament::AddSpaceBefore;
                 }
@@ -675,7 +766,6 @@ namespace GView::Type::SQL
         tokenList.Add(tokType, pos, next, tokColor, TokenDataType::None, align, tokenFlags);
         return next;
     }
-
     uint32 SQLFile::TokenizeOperator(const GView::View::LexicalViewer::TextParser& text, TokensList& tokenList, uint32 pos)
     {
         auto next = text.ParseSameGroupID(pos, CharType::GetCharType);
@@ -699,45 +789,51 @@ namespace GView::Type::SQL
         }
     }
 
-    void SQLFile::BuildBlocks(GView::View::LexicalViewer::SyntaxManager& syntax)
+void SQLFile::BuildBlocks(GView::View::LexicalViewer::SyntaxManager& syntax)
     {
         TokenIndexStack stBlocks;
         TokenIndexStack exprBlocks;
         auto len = syntax.tokens.Len();
         for (auto index = 0U; index < len; index++) {
-            auto typeID = syntax.tokens[index].GetTypeID(TokenType::None);
+            
+            auto typeID = syntax.tokens[index].GetTypeID(TokenType::None) & 0xFFFF;
+
             switch (typeID) {
             case TokenType::BlockOpen:
                 stBlocks.Push(index);
                 break;
             case TokenType::BlockClose:
+                if (stBlocks.Empty())
+                    break; 
                 syntax.blocks.Add(stBlocks.Pop(), index, BlockAlignament::ParentBlockWithIndent, BlockFlags::EndMarker);
                 break;
             case TokenType::ExpressionOpen:
                 exprBlocks.Push(index);
                 break;
             case TokenType::ExpressionClose:
-                syntax.blocks.Add(exprBlocks.Pop(), index, BlockAlignament::CurrentToken, BlockFlags::EndMarker | BlockFlags::ManualCollapse);
+                if (exprBlocks.Empty())
+                    break; // Safety to prevent crashes
+                syntax.blocks.Add(exprBlocks.Pop(), index, BlockAlignament::ParentBlockWithIndent, BlockFlags::EndMarker | BlockFlags::ManualCollapse);
                 break;
             }
         }
     }
-
     void SQLFile::Tokenize(const TextParser& text, TokensList& tokenList, BlocksList& blocks)
     {
         Tokenize(0, text.Len(), text, tokenList, blocks);
     }
 
-    void SQLFile::Tokenize(uint32 start, uint32 end, const TextParser& text, TokensList& tokenList, BlocksList& blocks)
+void SQLFile::Tokenize(uint32 start, uint32 end, const TextParser& text, TokensList& tokenList, BlocksList& blocks)
     {
-        auto idx  = start;
-        auto next = 0U;
+        auto idx       = start;
+        auto next      = 0U;
+        int parenDepth = 0;
+        int context    = 0;
 
         while (idx < end) {
             auto ch   = text[idx];
             auto type = CharType::GetCharType(ch);
 
-            // check for comments
             if (ch == '-') {
                 auto next = text[idx + 1];
                 if (next == '-')
@@ -747,6 +843,7 @@ namespace GView::Type::SQL
                 if (next == '*')
                     type = CharType::Comment;
             }
+
             switch (type) {
             case CharType::Space:
                 idx = text.ParseSpace(idx, SpaceType::All);
@@ -775,6 +872,109 @@ namespace GView::Type::SQL
                       TokenFlags::DisableSimilaritySearch);
                 idx = next;
                 break;
+
+            case CharType::ExpressionOpen: {
+                auto align = TokenAlignament::AddSpaceBefore;
+
+                // 1. Check Previous Token: If Function or Datatype, NO SPACE. e.g. "COUNT(", "INT("
+                auto lastID   = tokenList.GetLastTokenID();
+                auto lastType = lastID & 0xFFFF;
+                if (lastType == TokenType::Function || lastType == TokenType::Datatype) {
+                    align = TokenAlignament::None;
+                }
+
+                // 2. Check Context: If in CREATE TABLE context and at top level, this '(' starts the column list -> New Line
+                if (context == 2 && parenDepth == 0) {
+                    align = TokenAlignament::NewLineAfter | TokenAlignament::AddSpaceBefore;
+                }
+
+                parenDepth++;
+                tokenList.Add(TokenType::ExpressionOpen, idx, idx + 1, TokenColor::Operator, TokenDataType::None, align, TokenFlags::DisableSimilaritySearch);
+                idx++;
+                break;
+            }
+
+            case CharType::ExpressionClose: {
+                if (parenDepth > 0)
+                    parenDepth--;
+
+                auto align = TokenAlignament::None;
+
+                // 1. Force newline for CREATE TABLE (context 2) closing parenthesis
+                if (parenDepth == 0 && context == 2) {
+                    align = TokenAlignament::StartsOnNewLine;
+                }
+                // 2. Fallback for others (like INSERT): Force newline only if NOT String, Number, or Constant
+                else if (idx + 1 < end && text[idx + 1] == ';') {
+                    auto lastID   = tokenList.GetLastTokenID();
+                    auto lastType = lastID & 0xFFFF;
+                    if (lastType != TokenType::String && lastType != TokenType::Number && lastType != TokenType::Constant) {
+                        align = TokenAlignament::StartsOnNewLine;
+                    }
+                }
+                tokenList.Add(TokenType::ExpressionClose, idx, idx + 1, TokenColor::Operator, TokenDataType::None, align, TokenFlags::DisableSimilaritySearch);
+                idx++;
+                break;
+            }
+
+            case CharType::Comma: {
+                auto align = TokenAlignament::AddSpaceAfter;
+
+                // Logic to force new lines in Lists
+                bool isSelectColumn         = (context == 1 && parenDepth == 0);
+                bool isCreateField          = (context == 2 && parenDepth == 1);
+                bool isInsertTupleSeparator = (context == 3 && parenDepth == 0);
+
+                if (isSelectColumn || isCreateField || isInsertTupleSeparator) {
+                    align = TokenAlignament::NewLineAfter;
+                }
+
+                tokenList.Add(TokenType::Comma, idx, idx + 1, TokenColor::Operator, TokenDataType::None, align, TokenFlags::DisableSimilaritySearch);
+                idx++;
+                break;
+            }
+
+            case CharType::Semicolumn:
+                context    = 0;
+                parenDepth = 0;
+                tokenList.Add(
+                      TokenType::Semicolumn,
+                      idx,
+                      idx + 1,
+                      TokenColor::Operator,
+                      TokenDataType::None,
+                      TokenAlignament::NewLineAfter | TokenAlignament::AfterPreviousToken | TokenAlignament::ClearIndentAfterPaint,
+                      TokenFlags::DisableSimilaritySearch);
+                idx++;
+                break;
+            case CharType::Word:
+                idx = TokenizeWord(text, tokenList, idx);
+                {
+                    auto lastToken = tokenList.GetLastTokenID();
+                    auto type      = lastToken & 0xFFFF;
+
+                    if (type == TokenType::Keyword || type == TokenType::BlockOpen || type == TokenType::BlockClose) {
+                        uint32 keyID = lastToken >> 16;
+                        if (keyID == KeywordsType::Select)
+                            context = 1;
+                        if (keyID == KeywordsType::Create)
+                            context = 2;
+                        if (keyID == KeywordsType::Insert)
+                            context = 3;
+                        if (keyID == KeywordsType::Update)
+                            context = 0;
+
+                        if (keyID == KeywordsType::From)
+                            context = 0;
+                        if (keyID == KeywordsType::Set)
+                            context = 0;
+                    }
+                }
+                break;
+
+            case CharType::Operator:
+                idx = TokenizeOperator(text, tokenList, idx);
+                break;
             case CharType::ArrayOpen:
                 tokenList.Add(
                       TokenType::ArrayOpen,
@@ -789,28 +989,6 @@ namespace GView::Type::SQL
             case CharType::ArrayClose:
                 tokenList.Add(
                       TokenType::ArrayClose,
-                      idx,
-                      idx + 1,
-                      TokenColor::Operator,
-                      TokenDataType::None,
-                      TokenAlignament::None,
-                      TokenFlags::DisableSimilaritySearch);
-                idx++;
-                break;
-            case CharType::ExpressionOpen:
-                tokenList.Add(
-                      TokenType::ExpressionOpen,
-                      idx,
-                      idx + 1,
-                      TokenColor::Operator,
-                      TokenDataType::None,
-                      TokenAlignament::None,
-                      TokenFlags::DisableSimilaritySearch);
-                idx++;
-                break;
-            case CharType::ExpressionClose:
-                tokenList.Add(
-                      TokenType::ExpressionClose,
                       idx,
                       idx + 1,
                       TokenColor::Operator,
@@ -850,34 +1028,6 @@ namespace GView::Type::SQL
                 next = text.ParseString(idx, StringFormat::DoubleQuotes | StringFormat::SingleQuotes | StringFormat::AllowEscapeSequences);
                 tokenList.Add(TokenType::String, idx, next, TokenColor::String, TokenDataType::String);
                 idx = next;
-                break;
-            case CharType::Comma:
-                tokenList.Add(
-                      TokenType::Comma,
-                      idx,
-                      idx + 1,
-                      TokenColor::Operator,
-                      TokenDataType::None,
-                      TokenAlignament::AddSpaceBefore | TokenAlignament::AddSpaceAfter,
-                      TokenFlags::DisableSimilaritySearch);
-                idx++;
-                break;
-            case CharType::Semicolumn:
-                tokenList.Add(
-                      TokenType::Semicolumn,
-                      idx,
-                      idx + 1,
-                      TokenColor::Operator,
-                      TokenDataType::None,
-                      TokenAlignament::NewLineAfter | TokenAlignament::AfterPreviousToken | TokenAlignament::ClearIndentAfterPaint,
-                      TokenFlags::DisableSimilaritySearch);
-                idx++;
-                break;
-            case CharType::Word:
-                idx = TokenizeWord(text, tokenList, idx);
-                break;
-            case CharType::Operator:
-                idx = TokenizeOperator(text, tokenList, idx);
                 break;
             default:
                 next = text.ParseSameGroupID(idx, CharType::GetCharType);
