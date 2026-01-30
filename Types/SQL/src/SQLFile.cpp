@@ -594,7 +594,7 @@ uint32 SQLFile::TokenizeWord(const GView::View::LexicalViewer::TextParser& text,
                 if (tokType == TokenType::None) {
                     if (context == 4) {
                         tokType  = TokenType::String;
-                        tokColor = TokenColor::Constant;
+                        tokColor = TokenColor::Word;
                         context  = 0;
                     } else if (context == 5) {
                         tokType  = TokenType::String;
