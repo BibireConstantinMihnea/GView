@@ -63,7 +63,7 @@ namespace Type
 
         class SQLFile : public TypeInterface, public GView::View::LexicalViewer::ParseInterface
         {
-            uint32 TokenizeWord(const GView::View::LexicalViewer::TextParser& text, GView::View::LexicalViewer::TokensList& tokenList, uint32 pos);
+            uint32 TokenizeWord(const GView::View::LexicalViewer::TextParser& text, GView::View::LexicalViewer::TokensList& tokenList, uint32 pos, int& context);
             uint32 TokenizeOperator(const GView::View::LexicalViewer::TextParser& text, GView::View::LexicalViewer::TokensList& tokenList, uint32 pos);
             void BuildBlocks(GView::View::LexicalViewer::SyntaxManager& syntax);
             void Tokenize(
