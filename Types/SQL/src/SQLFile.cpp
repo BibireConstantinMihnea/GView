@@ -79,178 +79,177 @@ namespace Operators
 
     constexpr uint32 HASH_DEVIDER = 133;
 
-    // Indices calculated via: (ID1) or ((ID1 << 5) + ID2) % 133
-    uint32 operator_hash_table[HASH_DEVIDER] = {
-        TokenType::None,
-        (uint32) TokenType::Operator | (uint32) (OperatorType::Eq << 8) | (uint32) (1 << 16),            // =  (Hash: 1)
-        (uint32) TokenType::Operator | (uint32) (OperatorType::Gr << 8) | (uint32) (2 << 16),            // >  (Hash: 2)
-        (uint32) TokenType::Operator | (uint32) (OperatorType::Ls << 8) | (uint32) (3 << 16),            // <  (Hash: 3)
-        TokenType::None,                                                                                 // ! is not an operator by itself, strictly for !=
-        (uint32) TokenType::Operator | (uint32) (OperatorType::Add << 8) | (uint32) (5 << 16),           // +  (Hash: 5)
-        (uint32) TokenType::Operator | (uint32) (OperatorType::Sub << 8) | (uint32) (6 << 16),           // -  (Hash: 6)
-        (uint32) TokenType::Operator | (uint32) (OperatorType::Mul << 8) | (uint32) (7 << 16),           // * (Hash: 7)
-        (uint32) TokenType::Operator | (uint32) (OperatorType::Div << 8) | (uint32) (8 << 16),           // /  (Hash: 8)
-        (uint32) TokenType::Operator | (uint32) (OperatorType::Mod << 8) | (uint32) (9 << 16),           // %  (Hash: 9)
-        (uint32) TokenType::Operator | (uint32) (OperatorType::BitAnd << 8) | (uint32) (10 << 16),       // &  (Hash: 10)
-        (uint32) TokenType::Operator | (uint32) (OperatorType::BitOr << 8) | (uint32) (11 << 16),        // |  (Hash: 11)
-        (uint32) TokenType::Operator | (uint32) (OperatorType::BitXor << 8) | (uint32) (12 << 16),       // ^  (Hash: 12)
-        (uint32) TokenType::Operator | (uint32) (OperatorType::BitNot << 8) | (uint32) (13 << 16),       // ~  (Hash: 13)
-        (uint32) TokenType::Operator | (uint32) (OperatorType::MemberAccess << 8) | (uint32) (14 << 16), // . (Hash: 14)
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        (uint32) TokenType::Operator | (uint32) (OperatorType::ModEq << 8) | (uint32) (289 << 16), // %= (Hash: 289 -> idx 23)
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        (uint32) TokenType::Operator | (uint32) (OperatorType::AddEq << 8) | (uint32) (161 << 16), // += (Hash: 161 -> idx 28)
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        (uint32) TokenType::Operator | (uint32) (OperatorType::AndEq << 8) | (uint32) (321 << 16), // &= (Hash: 321 -> idx 55)
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        (uint32) TokenType::Operator | (uint32) (OperatorType::SubEq << 8) | (uint32) (193 << 16), // -= (Hash: 193 -> idx 60)
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        (uint32) TokenType::Operator | (uint32) (OperatorType::GrEq << 8) | (uint32) (65 << 16), // >= (Hash: 65 -> idx 65)
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        (uint32) TokenType::Operator | (uint32) (OperatorType::OrEq << 8) | (uint32) (353 << 16), // |= (Hash: 353 -> idx 87)
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        (uint32) TokenType::Operator | (uint32) (OperatorType::MulEq << 8) | (uint32) (225 << 16), // *= (Hash: 225 -> idx 92)
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        (uint32) TokenType::Operator | (uint32) (OperatorType::LsEq << 8) | (uint32) (97 << 16), // <= (Hash: 97 -> idx 97)
-        (uint32) TokenType::Operator | (uint32) (OperatorType::Neq << 8) | (uint32) (98 << 16),  // <> (Hash: 98 -> idx 98)
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        (uint32) TokenType::Operator | (uint32) (OperatorType::XorEq << 8) | (uint32) (385 << 16), // ^= (Hash: 385 -> idx 119)
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        (uint32) TokenType::Operator | (uint32) (OperatorType::DivEq << 8) | (uint32) (257 << 16), // /= (Hash: 257 -> idx 124)
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        TokenType::None,
-        (uint32) TokenType::Operator | (uint32) (OperatorType::Neq << 8) | (uint32) (129 << 16), // != (Hash: 129 -> idx 129)
-        TokenType::None,
-        TokenType::None,
-        TokenType::None
-    };
-
-    bool TextToOperatorID(const char16* txt, uint32 size, uint32& opID, uint32& opSize)
-    {
-        // compute the hashes over the entire 3 cases
-        uint32 hash1 = 0, hash2 = 0, hash3 = 0;
-        if (((*txt) < 128) && (chars_ids[*txt] != 0)) {
-            hash1 = chars_ids[*txt];
-            txt++;
-            if ((size > 1) && ((*txt) < 128) && (chars_ids[*txt] != 0)) {
-                hash2 = (hash1 << 5) + chars_ids[*txt];
+        uint32 operator_hash_table[HASH_DEVIDER] = {
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::Eq << 8) | (uint32) (1 << 16),
+            (uint32) TokenType::Operator | (uint32) (OperatorType::Gr << 8) | (uint32) (2 << 16),
+            (uint32) TokenType::Operator | (uint32) (OperatorType::Ls << 8) | (uint32) (3 << 16),
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::Add << 8) | (uint32) (5 << 16),
+            (uint32) TokenType::Operator | (uint32) (OperatorType::Sub << 8) | (uint32) (6 << 16),
+            (uint32) TokenType::Operator | (uint32) (OperatorType::Mul << 8) | (uint32) (7 << 16),
+            (uint32) TokenType::Operator | (uint32) (OperatorType::Div << 8) | (uint32) (8 << 16),
+            (uint32) TokenType::Operator | (uint32) (OperatorType::Mod << 8) | (uint32) (9 << 16),
+            (uint32) TokenType::Operator | (uint32) (OperatorType::BitAnd << 8) | (uint32) (10 << 16),
+            (uint32) TokenType::Operator | (uint32) (OperatorType::BitOr << 8) | (uint32) (11 << 16),
+            (uint32) TokenType::Operator | (uint32) (OperatorType::BitXor << 8) | (uint32) (12 << 16),
+            (uint32) TokenType::Operator | (uint32) (OperatorType::BitNot << 8) | (uint32) (13 << 16),
+            (uint32) TokenType::Operator | (uint32) (OperatorType::MemberAccess << 8) | (uint32) (14 << 16),
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::ModEq << 8) | (uint32) (289 << 16),
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::AddEq << 8) | (uint32) (161 << 16),
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::AndEq << 8) | (uint32) (321 << 16),
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::SubEq << 8) | (uint32) (193 << 16),
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::GrEq << 8) | (uint32) (65 << 16),
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::OrEq << 8) | (uint32) (353 << 16),
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::MulEq << 8) | (uint32) (225 << 16),
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::LsEq << 8) | (uint32) (97 << 16),
+            (uint32) TokenType::Operator | (uint32) (OperatorType::Neq << 8) | (uint32) (98 << 16),
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::XorEq << 8) | (uint32) (385 << 16),
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::DivEq << 8) | (uint32) (257 << 16),
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            TokenType::None,
+            (uint32) TokenType::Operator | (uint32) (OperatorType::Neq << 8) | (uint32) (129 << 16),
+            TokenType::None,
+            TokenType::None,
+            TokenType::None
+        };
+        
+        bool TextToOperatorID(const char16* txt, uint32 size, uint32& opID, uint32& opSize)
+        {
+            // compute the hashes over the entire 3 cases
+            uint32 hash1 = 0, hash2 = 0, hash3 = 0;
+            if (((*txt) < 128) && (chars_ids[*txt] != 0)) {
+                hash1 = chars_ids[*txt];
                 txt++;
-                if ((size > 2) && ((*txt) < 128) && (chars_ids[*txt] != 0))
-                    hash3 = (hash2 << 5) + chars_ids[*txt];
+                if ((size > 1) && ((*txt) < 128) && (chars_ids[*txt] != 0)) {
+                    hash2 = (hash1 << 5) + chars_ids[*txt];
+                    txt++;
+                    if ((size > 2) && ((*txt) < 128) && (chars_ids[*txt] != 0))
+                        hash3 = (hash2 << 5) + chars_ids[*txt];
+                }
             }
+            auto op = operator_hash_table[hash3 % HASH_DEVIDER];
+            if ((op != TokenType::None) && ((op >> 16) == hash3)) {
+                opID   = (op & 0xFF) | ((op & 0xFF00) << 8);
+                opSize = 3;
+                return true;
+            }
+            op = operator_hash_table[hash2 % HASH_DEVIDER];
+            if ((op != TokenType::None) && ((op >> 16) == hash2)) {
+                opID   = (op & 0xFF) | ((op & 0xFF00) << 8);
+                opSize = 2;
+                return true;
+            }
+            op = operator_hash_table[hash1 % HASH_DEVIDER];
+            if ((op != TokenType::None) && ((op >> 16) == hash1)) {
+                opID   = (op & 0xFF) | ((op & 0xFF00) << 8);
+                opSize = 1;
+                return true;
+            }
+            return false; // invalid operator
         }
-        auto op = operator_hash_table[hash3 % HASH_DEVIDER];
-        if ((op != TokenType::None) && ((op >> 16) == hash3)) {
-            opID   = (op & 0xFF) | ((op & 0xFF00) << 8);
-            opSize = 3;
-            return true;
-        }
-        op = operator_hash_table[hash2 % HASH_DEVIDER];
-        if ((op != TokenType::None) && ((op >> 16) == hash2)) {
-            opID   = (op & 0xFF) | ((op & 0xFF00) << 8);
-            opSize = 2;
-            return true;
-        }
-        op = operator_hash_table[hash1 % HASH_DEVIDER];
-        if ((op != TokenType::None) && ((op >> 16) == hash1)) {
-            opID   = (op & 0xFF) | ((op & 0xFF00) << 8);
-            opSize = 1;
-            return true;
-        }
-        return false; // invalid operator
-    }
-} // namespace Operators
+    } // namespace Operators
 
 namespace KeywordsType
 {
@@ -593,15 +592,14 @@ uint32 SQLFile::TokenizeWord(const GView::View::LexicalViewer::TextParser& text,
             if (tokType == TokenType::None) {
                 tokType = Datatype::TextToDatatypeID(text, pos, next);
                 if (tokType == TokenType::None) {
-                    // --- LOGICA CONTEXTUAL? PENTRU TABELE ?I ALIAS-URI ---
-                    if (context == 4) { // Urmeaz? un TABEL (dup? FROM, JOIN, UPDATE, INTO)
+                    if (context == 4) {
                         tokType  = TokenType::String;
                         tokColor = TokenColor::Constant;
-                        context  = 0;          // Reset?m contextul dup? identificare
-                    } else if (context == 5) { // Urmeaz? un ALIAS (dup? AS)
+                        context  = 0;
+                    } else if (context == 5) {
                         tokType  = TokenType::String;
                         tokColor = TokenColor::Keyword2;
-                        context  = 0; // Reset?m contextul dup? identificare
+                        context  = 0;
                     } else {
                         tokType = TokenType::String;
                     }
@@ -618,7 +616,6 @@ uint32 SQLFile::TokenizeWord(const GView::View::LexicalViewer::TextParser& text,
             align      = TokenAlignament::AddSpaceAfter | TokenAlignament::AddSpaceBefore;
         }
 
-        // Aliniere în func?ie de token-ul anterior
         auto lastTokenID = tokenList.GetLastTokenID();
         switch (lastTokenID & 0xFFFF) {
         case TokenType::ExpressionOpen:
@@ -638,14 +635,12 @@ uint32 SQLFile::TokenizeWord(const GView::View::LexicalViewer::TextParser& text,
         uint32 keywordID = tokType >> 16;
         auto lastTokenID = tokenList.GetLastTokenID();
 
-        // --- SETAREA CONTEXTULUI PENTRU TOKEN-UL URM?TOR ---
         if (keywordID == KeywordsType::From || keywordID == KeywordsType::Join || keywordID == KeywordsType::Update || keywordID == KeywordsType::Into) {
-            context = 4; // Marc?m c? urmeaz? un nume de tabel
+            context = 4;
         } else if (keywordID == KeywordsType::As) {
-            context = 5; // Marc?m c? urmeaz? un alias
+            context = 5;
         }
 
-        // Logic? pentru Blocuri (Select, From, Begin, End)
         if (keywordID == KeywordsType::Begin || keywordID == KeywordsType::Case) {
             tokType = TokenType::BlockOpen;
         } else if (keywordID == KeywordsType::End) {
@@ -665,51 +660,60 @@ uint32 SQLFile::TokenizeWord(const GView::View::LexicalViewer::TextParser& text,
             tokColor   = TokenColor::Keyword;
             tokenFlags = TokenFlags::DisableSimilaritySearch;
 
-            if (keywordID == KeywordsType::Select) {
-                align        = TokenAlignament::NewLineBefore | TokenAlignament::StartsOnNewLine;
-                auto peekPos = text.ParseSpace(next, SpaceType::All);
-                if (peekPos < text.Len() && text[peekPos] == '*') {
-                    align |= TokenAlignament::AddSpaceAfter;
-                } else {
-                    align |= TokenAlignament::NewLineAfter;
-                }
-            } else {
-                align = TokenAlignament::NewLineAfter | TokenAlignament::AddSpaceBefore | TokenAlignament::StartsOnNewLine;
-            }
-        } else if ((tokType & 0xFFFF) == TokenType::BlockClose) {
-            tokColor   = TokenColor::Keyword;
-            tokenFlags = TokenFlags::DisableSimilaritySearch;
+                if (keywordID == KeywordsType::Select) {
+                    align = TokenAlignament::StartsOnNewLine;
 
-            if (keywordID == KeywordsType::From) {
-                bool precededByStar = ((lastTokenID & 0xFFFF) == TokenType::Operator) && ((lastTokenID >> 16) == OperatorType::Mul);
-                if (precededByStar) {
-                    align = TokenAlignament::AfterPreviousToken | TokenAlignament::AddSpaceBefore | TokenAlignament::AddSpaceAfter |
-                            TokenAlignament::ClearIndentBeforePaint;
+                    auto lastTokenID = tokenList.GetLastTokenID();
+                    if ((lastTokenID & 0xFFFF) == TokenType::Semicolumn) {
+                        align |= TokenAlignament::NewLineBefore;
+                    }
+
+                    auto peekPos = text.ParseSpace(next, SpaceType::All);
+                    if (peekPos < text.Len() && text[peekPos] == '*') {
+                        align |= TokenAlignament::AddSpaceAfter;
+                    } else {
+                        align |= TokenAlignament::NewLineAfter;
+                    }
                 } else {
-                    align = TokenAlignament::StartsOnNewLine | TokenAlignament::ClearIndentBeforePaint | TokenAlignament::AddSpaceAfter;
+                    align = TokenAlignament::NewLineAfter | TokenAlignament::AddSpaceBefore | TokenAlignament::StartsOnNewLine;
+                }
+            }
+            else if ((tokType & 0xFFFF) == TokenType::BlockClose) {
+                tokColor   = TokenColor::Keyword;
+                tokenFlags = TokenFlags::DisableSimilaritySearch;
+
+                if (keywordID == KeywordsType::From) {
+                    bool precededByStar = ((lastTokenID & 0xFFFF) == TokenType::Operator) && ((lastTokenID >> 16) == OperatorType::Mul);
+
+                    if (precededByStar) {
+                        align = TokenAlignament::AfterPreviousToken | TokenAlignament::AddSpaceBefore | TokenAlignament::AddSpaceAfter |
+                                TokenAlignament::ClearIndentBeforePaint;
+                    } else {
+                        align = TokenAlignament::StartsOnNewLine | TokenAlignament::ClearIndentBeforePaint | TokenAlignament::AddSpaceAfter;
+                    }
+                } else {
+                    align = TokenAlignament::StartsOnNewLine | TokenAlignament::NewLineAfter | TokenAlignament::ClearIndentAfterPaint;
                 }
             } else {
-                align = TokenAlignament::StartsOnNewLine | TokenAlignament::NewLineAfter | TokenAlignament::ClearIndentAfterPaint;
-            }
-        } else {
-            tokColor   = TokenColor::Keyword;
-            align      = TokenAlignament::AddSpaceAfter | TokenAlignament::AddSpaceBefore;
-            tokenFlags = TokenFlags::DisableSimilaritySearch;
+                tokColor   = TokenColor::Keyword;
+                align      = TokenAlignament::AddSpaceAfter | TokenAlignament::AddSpaceBefore;
+                tokenFlags = TokenFlags::DisableSimilaritySearch;
 
             switch (keywordID) {
             case KeywordsType::Select:
                 align = TokenAlignament::AfterPreviousToken | TokenAlignament::NewLineAfter;
                 break;
 
-            case KeywordsType::From: {
-                bool precededByDelete = ((lastTokenID & 0xFFFF) == TokenType::Keyword) && ((lastTokenID >> 16) == KeywordsType::Delete);
-                if (precededByDelete) {
-                    align = TokenAlignament::AfterPreviousToken | TokenAlignament::AddSpaceBefore | TokenAlignament::AddSpaceAfter;
-                } else {
-                    align = TokenAlignament::StartsOnNewLine | TokenAlignament::ClearIndentBeforePaint | TokenAlignament::AddSpaceAfter;
+                case KeywordsType::From: {
+                    bool precededByDelete = ((lastTokenID & 0xFFFF) == TokenType::Keyword) && ((lastTokenID >> 16) == KeywordsType::Delete);
+
+                    if (precededByDelete) {
+                        align = TokenAlignament::AfterPreviousToken | TokenAlignament::AddSpaceBefore | TokenAlignament::AddSpaceAfter;
+                    } else {
+                        align = TokenAlignament::StartsOnNewLine | TokenAlignament::ClearIndentBeforePaint | TokenAlignament::AddSpaceAfter;
+                    }
+                    break;
                 }
-                break;
-            }
 
             case KeywordsType::Update:
             case KeywordsType::Delete:
@@ -717,18 +721,42 @@ uint32 SQLFile::TokenizeWord(const GView::View::LexicalViewer::TextParser& text,
             case KeywordsType::Create:
             case KeywordsType::Drop:
             case KeywordsType::Alter:
-            case KeywordsType::Truncate:
-                align = TokenAlignament::NewLineBefore | TokenAlignament::StartsOnNewLine | TokenAlignament::AddSpaceAfter;
-                break;
+            case KeywordsType::Truncate: {
+                align = TokenAlignament::StartsOnNewLine | TokenAlignament::AddSpaceAfter;
 
-            case KeywordsType::Where:
-            case KeywordsType::Group:
-            case KeywordsType::Order:
-            case KeywordsType::Having:
-            case KeywordsType::Join:
-            case KeywordsType::Set:
-                align = TokenAlignament::StartsOnNewLine | TokenAlignament::ClearIndentBeforePaint | TokenAlignament::AddSpaceAfter;
+                auto lastTokenID = tokenList.GetLastTokenID();
+                if ((lastTokenID & 0xFFFF) == TokenType::Semicolumn) {
+                    align |= TokenAlignament::NewLineBefore;
+                }
                 break;
+            }
+
+                case KeywordsType::Where:
+                case KeywordsType::Group:
+                case KeywordsType::Order:
+                case KeywordsType::Having:
+                case KeywordsType::Set:
+                case KeywordsType::Limit:
+                case KeywordsType::Offset:
+                case KeywordsType::Union:
+                case KeywordsType::Except:
+                case KeywordsType::Intersect:
+                    align = TokenAlignament::StartsOnNewLine | TokenAlignament::ClearIndentBeforePaint | TokenAlignament::AddSpaceAfter;
+                    break;
+
+                case KeywordsType::Join: {
+                    uint32 prevKeyID     = lastTokenID >> 16;
+                    bool isCompositeJoin = ((lastTokenID & 0xFFFF) == TokenType::Keyword) &&
+                                           (prevKeyID == KeywordsType::Inner || prevKeyID == KeywordsType::Left || prevKeyID == KeywordsType::Right ||
+                                            prevKeyID == KeywordsType::Full || prevKeyID == KeywordsType::Outer || prevKeyID == KeywordsType::Cross);
+
+                    if (isCompositeJoin) {
+                        align = TokenAlignament::AfterPreviousToken | TokenAlignament::AddSpaceBefore | TokenAlignament::AddSpaceAfter;
+                    } else {
+                        align = TokenAlignament::StartsOnNewLine | TokenAlignament::ClearIndentBeforePaint | TokenAlignament::AddSpaceAfter;
+                    }
+                    break;
+                }
 
             case KeywordsType::Values:
                 align = TokenAlignament::AddSpaceBefore | TokenAlignament::NewLineAfter;
@@ -739,18 +767,29 @@ uint32 SQLFile::TokenizeWord(const GView::View::LexicalViewer::TextParser& text,
                 align = TokenAlignament::AfterPreviousToken | TokenAlignament::AddSpaceAfter | TokenAlignament::AddSpaceBefore;
                 break;
 
-            case KeywordsType::By:
-            case KeywordsType::Into:
-            case KeywordsType::Left:
-            case KeywordsType::Right:
-            case KeywordsType::Inner:
-            case KeywordsType::Full:
-            case KeywordsType::Cross:
-            case KeywordsType::On:
-                align = TokenAlignament::AfterPreviousToken | TokenAlignament::AddSpaceBefore | TokenAlignament::AddSpaceAfter;
-                break;
+                case KeywordsType::By:
+                    align = TokenAlignament::AfterPreviousToken | TokenAlignament::AddSpaceBefore | TokenAlignament::AddSpaceAfter;
+                    break;
+
+                case KeywordsType::Into:
+                case KeywordsType::Using:
+                    align = TokenAlignament::AfterPreviousToken | TokenAlignament::AddSpaceBefore | TokenAlignament::AddSpaceAfter;
+                    break;
+
+                case KeywordsType::On:
+                    align = TokenAlignament::AfterPreviousToken | TokenAlignament::AddSpaceBefore | TokenAlignament::AddSpaceAfter;
+                    break;
+
+                case KeywordsType::Left:
+                case KeywordsType::Right:
+                case KeywordsType::Inner:
+                case KeywordsType::Full:
+                case KeywordsType::Cross:
+                case KeywordsType::Outer:
+                    align = TokenAlignament::StartsOnNewLine | TokenAlignament::ClearIndentBeforePaint | TokenAlignament::AddSpaceAfter;
+                    break;
+                }
             }
-        }
 
         if ((lastTokenID & 0xFFFF) == TokenType::BlockClose) {
             if (tokColor == TokenColor::Keyword) {
@@ -794,30 +833,30 @@ void SQLFile::BuildBlocks(GView::View::LexicalViewer::SyntaxManager& syntax)
     for (auto index = 0U; index < len; index++) {
         auto typeID = syntax.tokens[index].GetTypeID(TokenType::None) & 0xFFFF;
 
-        switch (typeID) {
-        case TokenType::BlockOpen:
-            stBlocks.Push(index);
-            break;
-        case TokenType::BlockClose:
-            if (stBlocks.Empty())
+            switch (typeID) {
+            case TokenType::BlockOpen:
+                stBlocks.Push(index);
                 break;
-            syntax.blocks.Add(stBlocks.Pop(), index, BlockAlignament::ParentBlockWithIndent, BlockFlags::EndMarker);
-            break;
-        case TokenType::ExpressionOpen:
-            exprBlocks.Push(index);
-            break;
-        case TokenType::ExpressionClose:
-            if (exprBlocks.Empty())
-                break; // Safety to prevent crashes
-            syntax.blocks.Add(exprBlocks.Pop(), index, BlockAlignament::ParentBlockWithIndent, BlockFlags::EndMarker | BlockFlags::ManualCollapse);
-            break;
+            case TokenType::BlockClose:
+                if (stBlocks.Empty())
+                    break; 
+                syntax.blocks.Add(stBlocks.Pop(), index, BlockAlignament::ParentBlockWithIndent, BlockFlags::EndMarker);
+                break;
+            case TokenType::ExpressionOpen:
+                exprBlocks.Push(index);
+                break;
+            case TokenType::ExpressionClose:
+                if (exprBlocks.Empty())
+                    break;
+                syntax.blocks.Add(exprBlocks.Pop(), index, BlockAlignament::ParentBlockWithIndent, BlockFlags::EndMarker | BlockFlags::ManualCollapse);
+                break;
+            }
         }
     }
-}
-void SQLFile::Tokenize(const TextParser& text, TokensList& tokenList, BlocksList& blocks)
-{
-    Tokenize(0, text.Len(), text, tokenList, blocks);
-}
+    void SQLFile::Tokenize(const TextParser& text, TokensList& tokenList, BlocksList& blocks)
+    {
+        Tokenize(0, text.Len(), text, tokenList, blocks);
+    }
 
 void SQLFile::Tokenize(uint32 start, uint32 end, const TextParser& text, TokensList& tokenList, BlocksList& blocks)
 {
@@ -825,6 +864,8 @@ void SQLFile::Tokenize(uint32 start, uint32 end, const TextParser& text, TokensL
     auto next      = 0U;
     int parenDepth = 0;
     int context    = 0;
+
+    bool hasNewLine = false;
 
     while (idx < end) {
         auto ch   = text[idx];
@@ -841,52 +882,88 @@ void SQLFile::Tokenize(uint32 start, uint32 end, const TextParser& text, TokensL
         }
 
         switch (type) {
-        case CharType::Space:
+        case CharType::Space: {
+            auto oldIdx = idx;
             idx = text.ParseSpace(idx, SpaceType::All);
+
+            for (auto i = oldIdx; i < idx; i++) {
+                if (text[i] == '\n' || text[i] == '\r') {
+                    hasNewLine = true;
+                    break;
+                }
+            }
             break;
-        case CharType::SingleLineComment:
+        }
+        case CharType::SingleLineComment: {
             next = text.ParseUntilEndOfLine(idx);
+
+            auto align = TokenAlignament::NewLineAfter | TokenAlignament::AddSpaceBefore;
+
+            if (hasNewLine && idx > start) {
+                auto lastID   = tokenList.GetLastTokenID();
+                auto lastType = lastID & 0xFFFF;
+
+                if (lastType != TokenType::Comment && lastType != TokenType::None) {
+                    align |= TokenAlignament::NewLineBefore;
+                }
+            }
+
             tokenList.Add(
                   TokenType::Comment,
                   idx,
                   next,
                   TokenColor::Comment,
                   TokenDataType::MetaInformation,
-                  TokenAlignament::NewLineAfter | TokenAlignament::AddSpaceBefore,
+                  align,
                   TokenFlags::DisableSimilaritySearch);
-            idx = next;
+            idx        = next;
+            hasNewLine = true;
             break;
-        case CharType::Comment:
+        }
+        case CharType::Comment: {
             next = text.ParseUntilNextCharacterAfterText(idx, "*/", false);
+
+            auto align = TokenAlignament::AddSpaceBefore | TokenAlignament::AddSpaceAfter;
+
+            if (hasNewLine && idx > start) {
+                auto lastID   = tokenList.GetLastTokenID();
+                auto lastType = lastID & 0xFFFF;
+
+                if (lastType != TokenType::Comment && lastType != TokenType::None) {
+                    align |= TokenAlignament::NewLineBefore;
+                }
+            }
+
             tokenList.Add(
                   TokenType::Comment,
                   idx,
                   next,
                   TokenColor::Comment,
                   TokenDataType::MetaInformation,
-                  TokenAlignament::AddSpaceBefore | TokenAlignament::AddSpaceAfter,
+                  align,
                   TokenFlags::DisableSimilaritySearch);
-            idx = next;
+            idx        = next;
+            hasNewLine = false;
             break;
+        }
 
         case CharType::ExpressionOpen: {
             auto align = TokenAlignament::AddSpaceBefore;
 
-            // 1. Check Previous Token: If Function or Datatype, NO SPACE. e.g. "COUNT(", "INT("
-            auto lastID   = tokenList.GetLastTokenID();
-            auto lastType = lastID & 0xFFFF;
-            if (lastType == TokenType::Function || lastType == TokenType::Datatype) {
-                align = TokenAlignament::None;
-            }
+                auto lastID   = tokenList.GetLastTokenID();
+                auto lastType = lastID & 0xFFFF;
+                if (lastType == TokenType::Function || lastType == TokenType::Datatype) {
+                    align = TokenAlignament::None;
+                }
 
-            // 2. Check Context: If in CREATE TABLE context and at top level, this '(' starts the column list -> New Line
-            if (context == 2 && parenDepth == 0) {
-                align = TokenAlignament::NewLineAfter | TokenAlignament::AddSpaceBefore;
-            }
+                if (context == 2 && parenDepth == 0) {
+                    align = TokenAlignament::NewLineAfter | TokenAlignament::AddSpaceBefore;
+                }
 
             parenDepth++;
             tokenList.Add(TokenType::ExpressionOpen, idx, idx + 1, TokenColor::Operator, TokenDataType::None, align, TokenFlags::DisableSimilaritySearch);
             idx++;
+            hasNewLine = false;
             break;
         }
 
@@ -896,30 +973,28 @@ void SQLFile::Tokenize(uint32 start, uint32 end, const TextParser& text, TokensL
 
             auto align = TokenAlignament::None;
 
-            // 1. Force newline for CREATE TABLE (context 2) closing parenthesis
-            if (parenDepth == 0 && context == 2) {
-                align = TokenAlignament::StartsOnNewLine;
-            }
-            // 2. Fallback for others (like INSERT): Force newline only if NOT String, Number, or Constant
-            else if (idx + 1 < end && text[idx + 1] == ';') {
-                auto lastID   = tokenList.GetLastTokenID();
-                auto lastType = lastID & 0xFFFF;
-                if (lastType != TokenType::String && lastType != TokenType::Number && lastType != TokenType::Constant) {
+                if (parenDepth == 0 && context == 2) {
                     align = TokenAlignament::StartsOnNewLine;
                 }
+                else if (idx + 1 < end && text[idx + 1] == ';') {
+                    auto lastID   = tokenList.GetLastTokenID();
+                    auto lastType = lastID & 0xFFFF;
+                    if (lastType != TokenType::String && lastType != TokenType::Number && lastType != TokenType::Constant) {
+                        align = TokenAlignament::StartsOnNewLine;
+                    }
+                }
+                tokenList.Add(TokenType::ExpressionClose, idx, idx + 1, TokenColor::Operator, TokenDataType::None, align, TokenFlags::DisableSimilaritySearch);
+                idx++;
+                hasNewLine = false;
+                break;
             }
-            tokenList.Add(TokenType::ExpressionClose, idx, idx + 1, TokenColor::Operator, TokenDataType::None, align, TokenFlags::DisableSimilaritySearch);
-            idx++;
-            break;
-        }
 
         case CharType::Comma: {
             auto align = TokenAlignament::AddSpaceAfter;
 
-            // Logic to force new lines in Lists
-            bool isSelectColumn         = (context == 1 && parenDepth == 0);
-            bool isCreateField          = (context == 2 && parenDepth == 1);
-            bool isInsertTupleSeparator = (context == 3 && parenDepth == 0);
+                bool isSelectColumn         = (context == 1 && parenDepth == 0);
+                bool isCreateField          = (context == 2 && parenDepth == 1);
+                bool isInsertTupleSeparator = (context == 3 && parenDepth == 0);
 
             if (isSelectColumn || isCreateField || isInsertTupleSeparator) {
                 align = TokenAlignament::NewLineAfter;
@@ -927,6 +1002,7 @@ void SQLFile::Tokenize(uint32 start, uint32 end, const TextParser& text, TokensL
 
             tokenList.Add(TokenType::Comma, idx, idx + 1, TokenColor::Operator, TokenDataType::None, align, TokenFlags::DisableSimilaritySearch);
             idx++;
+            hasNewLine = false;
             break;
         }
 
@@ -942,6 +1018,7 @@ void SQLFile::Tokenize(uint32 start, uint32 end, const TextParser& text, TokensL
                   TokenAlignament::NewLineAfter | TokenAlignament::AfterPreviousToken | TokenAlignament::ClearIndentAfterPaint,
                   TokenFlags::DisableSimilaritySearch);
             idx++;
+            hasNewLine = false;
             break;
         case CharType::Word:
             idx = TokenizeWord(text, tokenList, idx, context);
@@ -966,20 +1043,24 @@ void SQLFile::Tokenize(uint32 start, uint32 end, const TextParser& text, TokensL
                         context = 0;
                 }
             }
+            hasNewLine = false;
             break;
 
         case CharType::Operator:
             idx = TokenizeOperator(text, tokenList, idx);
+            hasNewLine = false;
             break;
         case CharType::ArrayOpen:
             tokenList.Add(
                   TokenType::ArrayOpen, idx, idx + 1, TokenColor::Operator, TokenDataType::None, TokenAlignament::None, TokenFlags::DisableSimilaritySearch);
             idx++;
+            hasNewLine = false;
             break;
         case CharType::ArrayClose:
             tokenList.Add(
                   TokenType::ArrayClose, idx, idx + 1, TokenColor::Operator, TokenDataType::None, TokenAlignament::None, TokenFlags::DisableSimilaritySearch);
             idx++;
+            hasNewLine = false;
             break;
         case CharType::BlockOpen:
             tokenList.Add(
@@ -991,6 +1072,7 @@ void SQLFile::Tokenize(uint32 start, uint32 end, const TextParser& text, TokensL
                   TokenAlignament::NewLineAfter | TokenAlignament::AddSpaceBefore,
                   TokenFlags::DisableSimilaritySearch);
             idx++;
+            hasNewLine = false;
             break;
         case CharType::BlockClose:
             tokenList.Add(
@@ -1002,21 +1084,25 @@ void SQLFile::Tokenize(uint32 start, uint32 end, const TextParser& text, TokensL
                   TokenAlignament::StartsOnNewLine | TokenAlignament::NewLineAfter | TokenAlignament::ClearIndentAfterPaint,
                   TokenFlags::DisableSimilaritySearch);
             idx++;
+            hasNewLine = false;
             break;
         case CharType::Number:
             next = text.ParseNumber(idx);
             tokenList.Add(TokenType::Number, idx, next, TokenColor::Number, TokenDataType::Number);
             idx = next;
+            hasNewLine = false;
             break;
         case CharType::String:
             next = text.ParseString(idx, StringFormat::DoubleQuotes | StringFormat::SingleQuotes | StringFormat::AllowEscapeSequences);
             tokenList.Add(TokenType::String, idx, next, TokenColor::String, TokenDataType::String);
             idx = next;
+            hasNewLine = false;
             break;
         default:
             next = text.ParseSameGroupID(idx, CharType::GetCharType);
             tokenList.Add(TokenType::String, idx, next, TokenColor::Word).SetError("Invalid character sequance");
             idx = next;
+            hasNewLine = false;
             break;
         }
     }
